@@ -1,0 +1,88 @@
+scalar Date
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(id: ID!): Node
+  userFeed(first: Int, after: String): TweetConnection!
+  searchTweets(query: String!, first: Int, after: String): TweetConnection!
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): AuthPayload!
+  login(input: LoginInput!): AuthPayload!
+  createTweet(input: CreateTweetInput!): Tweet!
+  followUser(input: FollowUserInput!): Follow!
+  unfollowUser(input: UnfollowUserInput!): Boolean!
+}
+
+input CreateUserInput {
+  name: String!
+  email: String!
+  password: String!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input CreateTweetInput {
+  content: String!
+}
+
+input FollowUserInput {
+  userIdToFollow: ID!
+}
+
+input UnfollowUserInput {
+  userIdToUnfollow: ID!
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  email: String!
+  tweets: [Tweet!]!
+  followers: [User!]!
+  following: [User!]!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type Tweet implements Node {
+  id: ID!
+  content: String!
+  author: User!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type Follow implements Node {
+  id: ID!
+  follower: User!
+  followee: User!
+  createdAt: Date!
+}
+
+type TweetConnection {
+  edges: [TweetEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TweetEdge {
+  node: Tweet!
+  cursor: String!
+}
+
+type AuthPayload {
+  token: String!
+  user: User!
+}
+
+type PageInfo {
+  endCursor: String
+  hasNextPage: Boolean!
+}
