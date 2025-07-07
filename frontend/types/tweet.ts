@@ -5,11 +5,12 @@ export interface Tweet {
   author: {
     id: string
     username: string
-    email: string
+    displayName?: string
+    email?: string
   }
-  likesCount: number
-  retweetsCount: number
-  repliesCount: number
+  likesCount?: number
+  retweetsCount?: number
+  repliesCount?: number
 }
 
 export interface CreateTweetInput {

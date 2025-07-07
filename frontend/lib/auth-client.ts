@@ -1,10 +1,9 @@
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
 import { graphqlClient } from "./graphql-client"
 import { SIGNUP_MUTATION, LOGIN_MUTATION } from "./graphql-mutations"
 import { setCookie, deleteCookie } from "./utils"
 import type { SignupInput, LoginInput, AuthResponse } from "@/types/auth"
 
+// Client-side auth actions
 export async function signupUser(input: SignupInput): Promise<AuthResponse> {
   try {
     const { data } = await graphqlClient.mutate({
@@ -59,32 +58,10 @@ export async function loginUser(input: LoginInput): Promise<AuthResponse> {
   }
 }
 
-export async function logoutUser() {
-  // Delete token from cookies (client-side)
+export function clientLogoutUser() {
+  // Delete token from cookies (client-side only)
   deleteCookie("auth-token")
   
-  // For server actions (if needed)
-  const cookieStore = await cookies()
-  cookieStore.delete("auth-token")
-  
-  redirect("/auth/login")
-}
-
-// For server components
-export async function getCurrentUser() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get("auth-token")?.value
-
-  if (!token) {
-    return null
-  }
-
-  try {
-    // Decode JWT to get user info
-    const payload = JSON.parse(atob(token.split(".")[1]))
-    return payload.user || payload
-  } catch (error) {
-    console.error("Error decoding token:", error)
-    return null
-  }
+  // Use window.location for client-side navigation to login page
+  window.location.href = "/auth/login"
 }

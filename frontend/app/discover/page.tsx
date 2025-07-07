@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth-actions"
+import { getCurrentUser } from "@/lib/auth-server"
 import { redirect } from "next/navigation"
 import { UserSearch } from "@/components/users/user-search"
 import Link from "next/link"

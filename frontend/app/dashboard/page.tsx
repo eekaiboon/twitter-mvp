@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth-actions"
+import { getCurrentUser } from "@/lib/auth-server"
 import { redirect } from "next/navigation"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { DashboardContent } from "@/components/dashboard/dashboard-content"

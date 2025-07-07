@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { loginUser } from "@/lib/auth-actions"
+import { loginUser } from "@/lib/auth-client" // Updated import
 import { validateLoginForm } from "@/lib/validation"
 import type { LoginFormData, FormErrors } from "@/types/auth"
 

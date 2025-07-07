@@ -1,12 +1,16 @@
-import { logoutUser } from "@/lib/auth-actions"
+"use client"
+
+import { clientLogoutUser } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 
 export function LogoutButton() {
+  const handleLogout = () => {
+    clientLogoutUser()
+  }
+
   return (
-    <form action={logoutUser}>
-      <Button type="submit" variant="outline" size="sm">
-        Logout
-      </Button>
-    </form>
+    <Button onClick={handleLogout} variant="outline" size="sm">
+      Logout
+    </Button>
   )
 }
