@@ -12,6 +12,21 @@ The project is split into two primary parts:
 
 Both parts use a shared GraphQL schema to enforce type safety and clean API design.
 
+## Authentication Flow
+
+The authentication system uses JWT tokens with the following flow:
+
+1. **Login/Signup**: User submits credentials via GraphQL mutation
+2. **Token Generation**: Backend validates credentials and generates JWT token containing user ID
+3. **Token Storage**: Frontend stores the JWT in local storage or memory
+4. **Request Authorization**: Frontend includes JWT in the Authorization header for subsequent requests
+5. **Token Validation**: 
+   - JwtStrategy extracts and decodes the token
+   - User is looked up in database using ID from token
+   - User object is attached to request context
+6. **Route Protection**: JwtAuthGuard protects routes requiring authentication
+7. **User Access**: CurrentUser decorator extracts authenticated user data from request
+
 ## Codebase Structure
 
 ### Frontend Structure
