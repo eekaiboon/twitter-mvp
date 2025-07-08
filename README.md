@@ -41,14 +41,15 @@ frontend/
 ```
 backend/
 ├── src/
-│   ├── auth/             # Authentication module
-│   │   ├── dto/          # Data Transfer Objects
-│   │   ├── guards/       # JWT Auth guards
-│   │   └── strategies/   # Passport strategies
-│   ├── users/            # Users module
-│   │   ├── entities/     # User entity definitions
-│   │   └── dto/          # User DTOs
-│   ├── tweets/           # Tweets module
+│   ├── modules/          # Feature modules
+│   │   ├── auth/         # Authentication module
+│   │   │   ├── dto/      # Data Transfer Objects
+│   │   │   ├── guards/   # JWT Auth guards
+│   │   │   └── strategies/ # Passport strategies
+│   │   ├── users/        # Users module
+│   │   │   ├── entities/ # User entity definitions
+│   │   │   └── dto/      # User DTOs
+│   │   └── tweets/       # Tweets module
 │   ├── prisma/           # Database service
 │   └── config/           # Configuration
 ├── prisma/               # Prisma schema and migrations
