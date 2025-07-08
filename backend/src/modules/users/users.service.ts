@@ -31,30 +31,66 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(createUserInput.password, 10);
 
     // Create user
-    return this.prisma.user.create({
+    const user = await this.prisma.user.create({
       data: {
         username: createUserInput.username,
         email: createUserInput.email,
         password: hashedPassword,
       },
     });
+    
+    // Map to User entity with proper typing
+    return {
+      ...user,
+      databaseId: user.id
+    } as unknown as User;
   }
 
   async findOne(id: number): Promise<User | null> {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
     });
+    
+    if (!user) {
+      return null;
+    }
+    
+    // Map to User entity with proper typing
+    return {
+      ...user,
+      databaseId: user.id
+    } as unknown as User;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { username },
     });
+    
+    if (!user) {
+      return null;
+    }
+    
+    // Map to User entity with proper typing
+    return {
+      ...user,
+      databaseId: user.id
+    } as unknown as User;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email },
     });
+    
+    if (!user) {
+      return null;
+    }
+    
+    // Map to User entity with proper typing
+    return {
+      ...user,
+      databaseId: user.id
+    } as unknown as User;
   }
 }

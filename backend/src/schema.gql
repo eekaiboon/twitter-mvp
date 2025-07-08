@@ -28,13 +28,26 @@ type Mutation {
   signup(input: CreateUserInput!): AuthPayload!
 }
 
+interface Node {
+  id: ID!
+}
+
 type Query {
   me: User!
-  user(id: Int!): User
+  node(id: ID!): Node
   userByUsername(username: String!): User
 }
 
-type User {
+type Tweet implements Node {
+  author: User!
+  authorId: Float!
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+  updatedAt: DateTime!
+}
+
+type User implements Node {
   createdAt: DateTime!
   email: String!
   id: ID!
