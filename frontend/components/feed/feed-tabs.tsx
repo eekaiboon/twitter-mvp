@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { TimelineFeed } from "./timeline-feed"
-import { TweetList } from "@/components/tweets/tweet-list"
+import { ServerTimelineFeed } from "./server-timeline-feed"
+import { ServerTweetList } from "@/components/tweets/server-tweet-list"
 
 interface FeedTabsProps {
   userId: string
@@ -24,11 +24,11 @@ export function FeedTabs({ userId }: FeedTabsProps) {
       </TabsList>
 
       <TabsContent value="timeline" className="mt-6">
-        <TimelineFeed refreshTrigger={refreshTrigger} />
+        <ServerTimelineFeed />
       </TabsContent>
 
       <TabsContent value="your-tweets" className="mt-6">
-        <TweetList userId={userId} refreshTrigger={refreshTrigger} />
+        <ServerTweetList userId={userId} />
       </TabsContent>
     </Tabs>
   )

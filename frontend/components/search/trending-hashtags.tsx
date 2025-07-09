@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Hash, TrendingUp } from "lucide-react"
-import { getTrendingHashtags } from "@/lib/search-actions"
+import { getTrendingHashtags } from "@/lib/api/actions/search"
 
 interface TrendingHashtag {
   hashtag: string

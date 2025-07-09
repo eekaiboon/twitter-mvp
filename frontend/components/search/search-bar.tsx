@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
-import { getSearchSuggestions } from "@/lib/search-actions"
+import { getSearchSuggestions } from "@/lib/api/actions/search"
 import { SearchSuggestions } from "./search-suggestions"
 import type { SearchSuggestion } from "@/types/search"
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { followUser, unfollowUser } from "@/lib/follow-actions"
+import { followUser, unfollowUser } from "@/lib/api/actions/follow"
 import { useToast } from "@/hooks/use-toast"
 
 interface FollowButtonProps {

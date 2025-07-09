@@ -1,5 +1,5 @@
-import { getUserProfile } from "@/lib/follow-actions"
-import { getCurrentUser } from "@/lib/auth-server"
+import { getUserProfile } from "@/lib/server/profile"
+import { getCurrentUser } from "@/lib/server/auth"
 import { redirect, notFound } from "next/navigation"
 import { ProfileHeader } from "@/components/profile/profile-header"
 import { ProfileTabs } from "@/components/profile/profile-tabs"

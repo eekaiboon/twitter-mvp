@@ -1,7 +1,9 @@
-import { getCurrentUser } from "@/lib/auth-server"
+import { getCurrentUser } from "@/lib/server/auth"
 import { redirect } from "next/navigation"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { DashboardContent } from "@/components/dashboard/dashboard-content"
+import { TimelineSection } from "./timeline-section"
+import { UserTweetsSection } from "./user-tweets-section"
 import Link from "next/link"
 
 export default async function DashboardPage() {
@@ -34,7 +36,11 @@ export default async function DashboardPage() {
       </header>
 
       <main className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <DashboardContent user={user} />
+        <DashboardContent 
+          user={user} 
+          timelineFeed={<TimelineSection user={user} />}
+          userTweets={<UserTweetsSection user={user} />}
+        />
       </main>
     </div>
   )

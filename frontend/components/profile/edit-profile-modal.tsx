@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { updateUserProfile } from "@/lib/profile-actions"
+import { updateUserProfile } from "@/lib/api/actions/profile"
 import { useToast } from "@/hooks/use-toast"
 import type { UserProfile } from "@/types/follow"
 
@@ -28,8 +28,8 @@ interface ProfileFormData {
 export function EditProfileModal({ user, isOpen, onClose }: EditProfileModalProps) {
   const [formData, setFormData] = useState<ProfileFormData>({
     bio: user.bio || "",
-    location: "",
-    website: "",
+    location: user.location || "",
+    website: user.website || "",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")

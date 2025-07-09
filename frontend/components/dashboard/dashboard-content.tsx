@@ -2,14 +2,16 @@
 
 import { useState } from "react"
 import { TweetComposer } from "@/components/tweets/tweet-composer"
-import { FeedTabs } from "@/components/feed/feed-tabs"
+import { DashboardTabs } from "@/components/dashboard/dashboard-tabs"
 import type { User } from "@/types/auth"
 
 interface DashboardContentProps {
   user: User
+  timelineFeed: React.ReactNode
+  userTweets: React.ReactNode
 }
 
-export function DashboardContent({ user }: DashboardContentProps) {
+export function DashboardContent({ user, timelineFeed, userTweets }: DashboardContentProps) {
   const [refreshTrigger, setRefreshTrigger] = useState(0)
 
   const handleTweetCreated = () => {
@@ -19,7 +21,11 @@ export function DashboardContent({ user }: DashboardContentProps) {
   return (
     <div className="space-y-6">
       <TweetComposer onTweetCreated={handleTweetCreated} />
-      <FeedTabs userId={user.id} />
+      <DashboardTabs 
+        user={user} 
+        timelineFeed={timelineFeed}
+        userTweets={userTweets}
+      />
     </div>
   )
 }

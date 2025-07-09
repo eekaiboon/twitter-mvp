@@ -29,6 +29,36 @@ The authentication system uses JWT tokens with the following flow:
 
 ## Codebase Structure
 
+### Architecture Overview
+
+The application uses a modern architecture with distinct responsibilities:
+
+- **Next.js Frontend**: Handles UI rendering, client-side state, and includes server components that run on the server
+- **NestJS Backend**: Manages data persistence, business logic, and exposes a GraphQL API
+
+While the frontend directory contains Next.js server components, these primarily act as a middleware layer between React components and the NestJS API. This separation of concerns allows each part to focus on its strengths - Next.js for efficient UI rendering and NestJS for robust API functionality.
+
+#### Frontend Architecture
+
+The frontend uses a clean architecture pattern with clear boundaries:
+
+- **Server Components**: Fetch data and handle authentication on the server
+- **Client Components**: Handle user interactions and local state
+- **API Layer**: Structured by domain with clear separation of concerns:
+  - `actions`: Business logic and API calls
+  - `graphql`: GraphQL queries and mutations
+  - `client`: Apollo client configuration
+- **Server/Client Utilities**: Separated to prevent mixing server and client code
+
+#### GraphQL and Relay ID Convention
+
+The application follows the GraphQL Relay Global Object Identification specification:
+
+- IDs are formatted as `base64(Type:id)` (e.g., `"VXNlcjox"` for `"User:1"`)
+- This format encodes both the object type and database ID
+- The frontend uses these Global IDs directly from the backend
+- This approach provides type safety and supports multiple data sources
+
 ### Frontend Structure
 ```
 frontend/
@@ -45,9 +75,16 @@ frontend/
 │   └── ui/               # Reusable UI components
 ├── hooks/                # Custom React hooks
 ├── lib/                  # Utility functions and API clients
-│   ├── auth-actions.ts   # Authentication actions
-│   ├── graphql-client.ts # Apollo client setup
-│   └── validation.ts     # Form validation logic
+│   ├── api/              # API-related code
+│   │   ├── client.ts     # Apollo GraphQL client
+│   │   ├── actions/      # Domain-specific actions
+│   │   └── graphql/      # GraphQL operations
+│   │       ├── fragments.ts # Shared fragments
+│   │       ├── mutations/   # GraphQL mutations
+│   │       └── queries/     # GraphQL queries
+│   ├── client/           # Client-only utilities
+│   ├── server/           # Server-only utilities
+│   └── utils/            # Shared utilities
 ├── middleware.ts         # Next.js middleware for auth protection
 └── types/                # TypeScript type definitions
 ```

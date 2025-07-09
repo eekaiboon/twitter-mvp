@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { createTweet } from "@/lib/tweet-actions"
+import { createTweet } from "@/lib/api/actions/tweet"
 import { ImageIcon, Smile } from "lucide-react"
 
 interface TweetComposerProps {

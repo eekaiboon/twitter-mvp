@@ -3,25 +3,26 @@
 import { useState, useEffect, useCallback } from "react"
 import { TweetCard } from "./tweet-card"
 import { TweetSkeleton } from "./tweet-skeleton"
-import { getUserTimeline } from "@/lib/feed-actions"
+import { getClientUserTimeline } from "@/lib/api/actions/timeline-client"
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { TimelineTweet } from "@/types/feed"
+import type { TimelineTweet, TimelineResponse } from "@/types/feed"
 
 interface TweetListProps {
   userId: string
-  refreshTrigger: number
+  refreshTrigger?: number
+  initialData?: TimelineResponse
 }
 
-export function TweetList({ userId, refreshTrigger }: TweetListProps) {
-  const [tweets, setTweets] = useState<TimelineTweet[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+export function TweetList({ userId, refreshTrigger = 0, initialData }: TweetListProps) {
+  const [tweets, setTweets] = useState<TimelineTweet[]>(initialData?.success ? initialData.tweets || [] : [])
+  const [isLoading, setIsLoading] = useState(!initialData?.success)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [hasMore, setHasMore] = useState(true)
-  const [nextCursor, setNextCursor] = useState<string | undefined>()
+  const [hasMore, setHasMore] = useState(initialData?.hasMore ?? true)
+  const [nextCursor, setNextCursor] = useState<string | undefined>(initialData?.nextCursor)
 
   const loadTweets = useCallback(
     async (cursor?: string, reset = false) => {
@@ -33,7 +34,7 @@ export function TweetList({ userId, refreshTrigger }: TweetListProps) {
           setIsLoadingMore(true)
         }
 
-        const result = await getUserTimeline(userId, {
+        const result = await getClientUserTimeline(userId, {
           limit: 10,
           cursor,
         })
@@ -76,8 +77,12 @@ export function TweetList({ userId, refreshTrigger }: TweetListProps) {
   })
 
   useEffect(() => {
+    // Don't load initially if we already have data from the server
+    if (initialData?.success && refreshTrigger === 0) {
+      return;
+    }
     loadTweets(undefined, true)
-  }, [loadTweets, refreshTrigger])
+  }, [loadTweets, refreshTrigger, initialData])
 
   if (isLoading) {
     return (

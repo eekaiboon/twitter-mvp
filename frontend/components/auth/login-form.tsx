@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { loginUser } from "@/lib/auth-client" // Updated import
-import { validateLoginForm } from "@/lib/validation"
+import { loginUser } from "@/lib/api/actions/auth"
+import { validateLoginForm } from "@/lib/utils/validation"
 import type { LoginFormData, FormErrors } from "@/types/auth"
 
 export function LoginForm() {
