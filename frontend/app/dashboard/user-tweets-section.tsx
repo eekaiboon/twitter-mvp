@@ -1,19 +1,26 @@
-import { getUserTimeline } from "@/lib/server/feed"
-import TweetListWrapper from "./tweet-list-wrapper"
+"use client"
+
+import { TweetComposer } from "@/components/tweets/tweet-composer"
+import { UserTweetsList } from "@/components/tweets/user-tweets-list"
 import type { User } from "@/types/auth"
+import { useState } from "react"
 
 interface UserTweetsSectionProps {
   user: User
 }
 
-export async function UserTweetsSection({ user }: UserTweetsSectionProps) {
-  // Server-side fetch of user tweets
-  try {
-    const userTweetsData = await getUserTimeline(user.id, { limit: 10 })
-    // Use client wrapper to avoid direct client component with server data
-    return <TweetListWrapper userId={user.id} initialData={userTweetsData} />
-  } catch (error) {
-    // Fall back to client-side rendering if server fetch fails
-    return <TweetListWrapper userId={user.id} initialData={{ success: false, tweets: [], error: "Failed to load" }} />
+export default function UserTweetsSection({ user }: UserTweetsSectionProps) {
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+  
+  const handleTweetCreated = () => {
+    // Increment refresh trigger to force tweets list to refresh
+    setRefreshTrigger(prev => prev + 1)
   }
+  
+  return (
+    <div className="space-y-4">
+      <TweetComposer onTweetCreated={handleTweetCreated} />
+      <UserTweetsList userId={user.id} refreshTrigger={refreshTrigger} />
+    </div>
+  )
 }

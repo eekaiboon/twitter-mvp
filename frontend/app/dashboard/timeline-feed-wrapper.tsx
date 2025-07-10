@@ -1,12 +1,12 @@
 "use client";
 
-import { TimelineFeed } from "@/components/feed/timeline-feed";
-import type { TimelineResponse } from "@/types/feed";
+import { TweetList } from "@/components/tweets/tweet-list";
+import type { TweetsResponse } from "@/types/tweet";
 
 interface TimelineFeedWrapperProps {
-  initialData: TimelineResponse;
+  initialData: TweetsResponse;
 }
 
 export default function TimelineFeedWrapper({ initialData }: TimelineFeedWrapperProps) {
-  return <TimelineFeed initialData={initialData} />;
+  return <TweetList initialData={initialData} userId={""} />;
 }

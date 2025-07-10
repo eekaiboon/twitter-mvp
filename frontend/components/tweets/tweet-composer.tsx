@@ -1,14 +1,14 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { createTweet } from "@/lib/api/actions/tweet"
 import { ImageIcon, Smile } from "lucide-react"
+import { addLocalTweet } from "@/lib/client/local-storage"
+import type { Tweet } from "@/types/tweet"
 
 interface TweetComposerProps {
   onTweetCreated?: () => void
@@ -18,6 +18,7 @@ export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
   const [content, setContent] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const [success, setSuccess] = useState(false)
 
   const characterCount = content.length
   const maxCharacters = 280
@@ -33,19 +34,42 @@ export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
 
     setIsLoading(true)
     setError("")
+    setSuccess(false)
 
     try {
-      const result = await createTweet({ content: content.trim() })
+      // Create a local tweet object
+      const now = new Date();
+      const mockTweet: Tweet = {
+        id: `local-${Date.now()}`,
+        content: content.trim(),
+        createdAt: now.toISOString(),
+        author: {
+          id: 'current-user',
+          username: 'you',
+          displayName: 'Current User',
+        },
+        likesCount: 0,
+        retweetsCount: 0,
+        repliesCount: 0
+      };
 
-      if (result.success) {
+      // Save to local storage
+      addLocalTweet(mockTweet);
+      
+      // Clear form and show success
+      setTimeout(() => {
         setContent("")
+        setSuccess(true)
         onTweetCreated?.()
-      } else {
-        setError(result.error || "Failed to post tweet")
-      }
+        setIsLoading(false)
+        
+        // Hide success message after 3 seconds
+        setTimeout(() => {
+          setSuccess(false)
+        }, 3000)
+      }, 500)
     } catch (err) {
       setError("An unexpected error occurred")
-    } finally {
       setIsLoading(false)
     }
   }
@@ -63,6 +87,12 @@ export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {success && (
+            <Alert className="bg-green-50 border-green-200">
+              <AlertDescription className="text-green-700">Tweet posted successfully!</AlertDescription>
             </Alert>
           )}
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { TweetList } from "@/components/tweets/tweet-list";
-import type { TimelineResponse } from "@/types/feed";
+import type { TweetsResponse } from "@/types/tweet";
 
 interface TweetListWrapperProps {
   userId: string;
-  initialData: TimelineResponse;
+  initialData: TweetsResponse;
 }
 
 export default function TweetListWrapper({ userId, initialData }: TweetListWrapperProps) {

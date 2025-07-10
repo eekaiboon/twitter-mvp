@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 import { User } from '../../users/entities/user.entity';
 import { Node } from '../../../common/interfaces/node.interface';
 import { toGlobalId } from '../../../common/utils/relay.utils';
@@ -22,6 +22,15 @@ export class Tweet implements Node {
 
   @Field(() => User)
   author: User;
+
+  @Field(() => Int)
+  likesCount: number;
+
+  @Field(() => Int)
+  retweetsCount: number;
+
+  @Field(() => Int)
+  repliesCount: number;
 
   @Field()
   createdAt: Date;

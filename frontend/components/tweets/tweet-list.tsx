@@ -3,29 +3,28 @@
 import { useState, useEffect, useCallback } from "react"
 import { TweetCard } from "./tweet-card"
 import { TweetSkeleton } from "./tweet-skeleton"
-import { getClientUserTimeline } from "@/lib/api/actions/timeline-client"
+import { getUserTweets } from "@/lib/api/actions/tweet"
 import { useInfiniteScroll } from "@/hooks/use-infinite-scroll"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { TimelineTweet, TimelineResponse } from "@/types/feed"
+import type { TweetsResponse, Tweet } from "@/types/tweet"
 
 interface TweetListProps {
   userId: string
   refreshTrigger?: number
-  initialData?: TimelineResponse
+  initialData?: TweetsResponse
 }
 
 export function TweetList({ userId, refreshTrigger = 0, initialData }: TweetListProps) {
-  const [tweets, setTweets] = useState<TimelineTweet[]>(initialData?.success ? initialData.tweets || [] : [])
+  const [tweets, setTweets] = useState<Tweet[]>(initialData?.success ? initialData.tweets || [] : [])
   const [isLoading, setIsLoading] = useState(!initialData?.success)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [hasMore, setHasMore] = useState(initialData?.hasMore ?? true)
-  const [nextCursor, setNextCursor] = useState<string | undefined>(initialData?.nextCursor)
+  const [hasMore, setHasMore] = useState(false) // No pagination implemented yet
 
   const loadTweets = useCallback(
-    async (cursor?: string, reset = false) => {
+    async (reset = false) => {
       try {
         if (reset) {
           setIsLoading(true)
@@ -34,19 +33,10 @@ export function TweetList({ userId, refreshTrigger = 0, initialData }: TweetList
           setIsLoadingMore(true)
         }
 
-        const result = await getClientUserTimeline(userId, {
-          limit: 10,
-          cursor,
-        })
+        const result = await getUserTweets(userId)
 
         if (result.success && result.tweets) {
-          if (reset) {
-            setTweets(result.tweets)
-          } else {
-            setTweets((prev) => [...prev, ...result.tweets!])
-          }
-          setHasMore(result.hasMore || false)
-          setNextCursor(result.nextCursor)
+          setTweets(result.tweets)
         } else {
           setError(result.error || "Failed to load tweets")
         }
@@ -60,20 +50,14 @@ export function TweetList({ userId, refreshTrigger = 0, initialData }: TweetList
     [userId],
   )
 
-  const handleLoadMore = useCallback(() => {
-    if (hasMore && !isLoadingMore && nextCursor) {
-      loadTweets(nextCursor, false)
-    }
-  }, [hasMore, isLoadingMore, nextCursor, loadTweets])
-
   const handleRefresh = () => {
-    loadTweets(undefined, true)
+    loadTweets(true)
   }
 
   const { loadingRef } = useInfiniteScroll({
     hasMore,
     isLoading: isLoadingMore,
-    onLoadMore: handleLoadMore,
+    onLoadMore: () => {}, // No pagination yet
   })
 
   useEffect(() => {
@@ -81,7 +65,7 @@ export function TweetList({ userId, refreshTrigger = 0, initialData }: TweetList
     if (initialData?.success && refreshTrigger === 0) {
       return;
     }
-    loadTweets(undefined, true)
+    loadTweets(true)
   }, [loadTweets, refreshTrigger, initialData])
 
   if (isLoading) {
@@ -139,7 +123,7 @@ export function TweetList({ userId, refreshTrigger = 0, initialData }: TweetList
         <TweetCard key={tweet.id} tweet={tweet} />
       ))}
 
-      {/* Infinite scroll trigger */}
+      {/* Loading indicator */}
       <div ref={loadingRef} className="py-4">
         {isLoadingMore && (
           <div className="space-y-4">

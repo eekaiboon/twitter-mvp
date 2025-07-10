@@ -2,8 +2,7 @@ import { getCurrentUser } from "@/lib/server/auth"
 import { redirect } from "next/navigation"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { DashboardContent } from "@/components/dashboard/dashboard-content"
-import { TimelineSection } from "./timeline-section"
-import { UserTweetsSection } from "./user-tweets-section"
+import UserTweetsSection from "./user-tweets-section"
 import Link from "next/link"
 
 export default async function DashboardPage() {
@@ -38,8 +37,15 @@ export default async function DashboardPage() {
       <main className="max-w-4xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
         <DashboardContent 
           user={user} 
-          timelineFeed={<TimelineSection user={user} />}
           userTweets={<UserTweetsSection user={user} />}
+          timelineFeed={
+            <div className="bg-white shadow rounded-lg p-6">
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Coming Soon</h3>
+                <p className="text-gray-600 mb-4">Timeline feeds will be implemented in Milestone 4.</p>
+              </div>
+            </div>
+          }
         />
       </main>
     </div>

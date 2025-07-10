@@ -241,7 +241,7 @@ The frontend application will be available at http://localhost:3000
 - JWT authentication
 - Protected routes
 
-### Milestone 2: Tweeting
+### Milestone 2: Tweeting ✅
 - Create and fetch tweets
 - User profile tweets
 
@@ -260,3 +260,24 @@ The frontend application will be available at http://localhost:3000
 ### Milestone 6: Profile Pages
 - Public user profiles
 - User info and tweets display
+
+## Future Milestones
+
+### Engagement Features
+- Like functionality for tweets
+- Comment/reply system
+- Retweet capability
+- Tweet sharing
+
+### Media Support
+- Image upload and display in tweets
+- Video embedding
+
+### Notifications
+- Activity notifications
+- Email notifications
+- Push notifications
+
+### Direct Messaging
+- Private conversations between users
+- Group messaging

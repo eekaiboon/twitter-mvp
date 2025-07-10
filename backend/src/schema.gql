@@ -7,6 +7,10 @@ type AuthPayload {
   user: User!
 }
 
+input CreateTweetInput {
+  content: String!
+}
+
 input CreateUserInput {
   email: String!
   password: String!
@@ -24,6 +28,7 @@ input LoginInput {
 }
 
 type Mutation {
+  createTweet(input: CreateTweetInput!): Tweet!
   login(input: LoginInput!): AuthPayload!
   signup(input: CreateUserInput!): AuthPayload!
 }
@@ -33,6 +38,7 @@ interface Node {
 }
 
 type Query {
+  getUserTweets(userId: ID!): [Tweet!]!
   me: User!
   node(id: ID!): Node
   userByUsername(username: String!): User
@@ -44,6 +50,9 @@ type Tweet implements Node {
   content: String!
   createdAt: DateTime!
   id: ID!
+  likesCount: Float!
+  repliesCount: Float!
+  retweetsCount: Float!
   updatedAt: DateTime!
 }
 
