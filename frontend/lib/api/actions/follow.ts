@@ -1,6 +1,7 @@
 'use client';
 
 import { graphqlClient } from "../client"
+import { toGlobalId } from "../global-id"
 import {
   FOLLOW_USER_MUTATION,
   UNFOLLOW_USER_MUTATION
@@ -13,17 +14,30 @@ import type { FollowInput, FollowResponse, UserProfileResponse, UsersResponse } 
 
 export async function followUser(input: FollowInput): Promise<FollowResponse> {
   try {
-    const { data } = await graphqlClient.mutate({
-      mutation: FOLLOW_USER_MUTATION,
-      variables: { input },
-      refetchQueries: ["GetUserProfile", "GetFollowers", "GetFollowing"],
-    })
-
-    if (data?.followUser) {
-      return { success: true, relationship: data.followUser }
+    if (!input.targetUserId) {
+      console.error("followUser called with no targetUserId:", input);
+      return { success: false, error: "No user ID provided" };
     }
 
-    return { success: false, error: "Failed to follow user" }
+    // Convert to global ID format (User:id)
+    const globalId = toGlobalId("User", input.targetUserId);
+    console.log("Following user with ID:", input.targetUserId, "Global ID:", globalId);
+    
+    const { data } = await graphqlClient.mutate({
+      mutation: FOLLOW_USER_MUTATION,
+      variables: { targetUserId: globalId },
+      refetchQueries: [
+        // This will force a refresh of any profile data on the page
+        { query: GET_USER_PROFILE_QUERY, variables: { username: input.username } }
+      ],
+      awaitRefetchQueries: true
+    })
+
+    if (data?.followUser?.success) {
+      return { success: true, targetUser: data.followUser.targetUser }
+    }
+
+    return { success: false, error: data?.followUser?.error || "Failed to follow user" }
   } catch (error: any) {
     console.error("Follow user error:", error)
 
@@ -37,17 +51,30 @@ export async function followUser(input: FollowInput): Promise<FollowResponse> {
 
 export async function unfollowUser(input: FollowInput): Promise<FollowResponse> {
   try {
+    if (!input.targetUserId) {
+      console.error("unfollowUser called with no targetUserId:", input);
+      return { success: false, error: "No user ID provided" };
+    }
+
+    // Convert to global ID format (User:id)
+    const globalId = toGlobalId("User", input.targetUserId);
+    console.log("Unfollowing user with ID:", input.targetUserId, "Global ID:", globalId);
+    
     const { data } = await graphqlClient.mutate({
       mutation: UNFOLLOW_USER_MUTATION,
-      variables: { input },
-      refetchQueries: ["GetUserProfile", "GetFollowers", "GetFollowing"],
+      variables: { targetUserId: globalId },
+      refetchQueries: [
+        // This will force a refresh of any profile data on the page
+        { query: GET_USER_PROFILE_QUERY, variables: { username: input.username } }
+      ],
+      awaitRefetchQueries: true
     })
 
     if (data?.unfollowUser?.success) {
-      return { success: true }
+      return { success: true, targetUser: data.unfollowUser.targetUser }
     }
 
-    return { success: false, error: "Failed to unfollow user" }
+    return { success: false, error: data?.unfollowUser?.error || "Failed to unfollow user" }
   } catch (error: any) {
     console.error("Unfollow user error:", error)
 
@@ -64,11 +91,11 @@ export async function getUserProfile(username: string): Promise<UserProfileRespo
     const { data } = await graphqlClient.query({
       query: GET_USER_PROFILE_QUERY,
       variables: { username },
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "network-only",
     })
 
-    if (data?.getUserProfile) {
-      return { success: true, user: data.getUserProfile }
+    if (data?.userByUsername) {
+      return { success: true, user: data.userByUsername }
     }
 
     return { success: false, error: "User not found" }
@@ -88,7 +115,7 @@ export async function searchUsers(query: string, limit = 10): Promise<UsersRespo
     const { data } = await graphqlClient.query({
       query: SEARCH_USERS_QUERY,
       variables: { query, limit },
-      fetchPolicy: "cache-and-network",
+      fetchPolicy: "network-only",
     })
 
     if (data?.searchUsers) {

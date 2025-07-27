@@ -4,19 +4,14 @@ import { cookies } from "next/headers"
 // Import query string directly to avoid client-side code
 const GET_USER_PROFILE_QUERY = `
   query GetUserProfile($username: String!) {
-    getUserProfile(username: $username) {
+    userByUsername(username: $username) {
       id
       username
       email
-      bio
-      location
-      website
       createdAt
       followersCount
       followingCount
-      tweetsCount
-      isFollowing
-      isFollowedBy
+      isFollowedByMe
     }
   }
 `
@@ -25,7 +20,8 @@ import type { UserProfileResponse } from "@/types/follow"
 // Server-side implementation of getUserProfile
 export async function getUserProfile(username: string): Promise<UserProfileResponse> {
   try {
-    const cookieStore = cookies()
+    // Get cookie store and await it properly
+    const cookieStore = await cookies()
     const token = cookieStore.get("auth-token")?.value
     
     if (!token) {
@@ -43,7 +39,7 @@ export async function getUserProfile(username: string): Promise<UserProfileRespo
         query: GET_USER_PROFILE_QUERY,
         variables: { username }
       }),
-      next: { revalidate: 60 } // Cache for 60 seconds
+      next: { revalidate: 0 } // Disable cache for now
     })
     
     const result = await response.json()
@@ -53,8 +49,10 @@ export async function getUserProfile(username: string): Promise<UserProfileRespo
       return { success: false, error: result.errors[0]?.message || "Failed to fetch user profile" }
     }
     
-    if (result.data?.getUserProfile) {
-      return { success: true, user: result.data.getUserProfile }
+    if (result.data?.userByUsername) {
+      // Log the user object to see what kind of ID we're getting
+      console.log('User profile from API:', JSON.stringify(result.data.userByUsername))
+      return { success: true, user: result.data.userByUsername }
     }
     
     return { success: false, error: "User not found" }

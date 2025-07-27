@@ -1,42 +1,32 @@
-export interface FollowRelationship {
+export interface TargetUser {
   id: string
-  followerId: string
-  followingId: string
-  createdAt: string
-  follower: {
-    id: string
-    username: string
-    email: string
-  }
-  following: {
-    id: string
-    username: string
-    email: string
-  }
+  username: string
+  email: string
+  followersCount: number
+  followingCount: number
+  isFollowedByMe: boolean
 }
 
 export interface UserProfile {
   id: string
   username: string
   email: string
-  bio?: string
-  location?: string
-  website?: string
   createdAt: string
   followersCount: number
   followingCount: number
-  tweetsCount: number
-  isFollowing: boolean
-  isFollowedBy: boolean
+  isFollowedByMe: boolean
+  // Add optional fields that we'll compute or mock on the client side if needed
+  tweetsCount?: number
 }
 
 export interface FollowInput {
-  userId: string
+  targetUserId: string
+  username: string
 }
 
 export interface FollowResponse {
   success: boolean
-  relationship?: FollowRelationship
+  targetUser?: TargetUser
   error?: string
 }
 

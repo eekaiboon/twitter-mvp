@@ -27,4 +27,20 @@ export class User implements Node {
 
   @Field()
   updatedAt: Date;
+
+  // Follow relationships
+  @Field(() => [User], { nullable: true })
+  followers?: User[];
+
+  @Field(() => [User], { nullable: true })
+  following?: User[];
+
+  @Field(() => Number)
+  followersCount: number;
+
+  @Field(() => Number)
+  followingCount: number;
+
+  @Field(() => Boolean)
+  isFollowedByMe: boolean;
 }

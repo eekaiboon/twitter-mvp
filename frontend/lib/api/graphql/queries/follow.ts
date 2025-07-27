@@ -2,19 +2,14 @@ import { gql } from "@apollo/client"
 
 export const GET_USER_PROFILE_QUERY = gql`
   query GetUserProfile($username: String!) {
-    getUserProfile(username: $username) {
+    userByUsername(username: $username) {
       id
       username
       email
-      bio
-      location
-      website
       createdAt
       followersCount
       followingCount
-      tweetsCount
-      isFollowing
-      isFollowedBy
+      isFollowedByMe
     }
   }
 `

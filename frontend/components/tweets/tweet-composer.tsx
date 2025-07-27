@@ -9,12 +9,15 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { ImageIcon, Smile } from "lucide-react"
 import { addLocalTweet } from "@/lib/client/local-storage"
 import type { Tweet } from "@/types/tweet"
+import type { User } from "@/types/auth"
 
 interface TweetComposerProps {
   onTweetCreated?: () => void
+  user?: User
 }
 
-export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
+export function TweetComposer({ onTweetCreated, user }: TweetComposerProps) {
+  console.log('[TweetComposer] Received user:', user ? JSON.stringify(user, null, 2) : 'undefined');
   const [content, setContent] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -37,24 +40,52 @@ export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
     setSuccess(false)
 
     try {
+      console.log('[TweetComposer] Starting tweet creation');
+      
+      // The user ID is stored in the 'sub' field in the JWT token
+      // This follows the JWT standard where 'sub' means subject (user identifier)
+      const userId = user?.sub;
+      
+      console.log('[TweetComposer] Creating new tweet with:', {
+        userId: userId,
+        username: user?.username,
+        tweetContent: content.trim().substring(0, 20) + '...'
+      });
+      
       // Create a local tweet object
       const now = new Date();
-      const mockTweet: Tweet = {
+      const newTweet: Tweet = {
         id: `local-${Date.now()}`,
         content: content.trim(),
         createdAt: now.toISOString(),
         author: {
-          id: 'current-user',
-          username: 'you',
-          displayName: 'Current User',
+          // Use the 'sub' field from JWT as the author ID
+          // Convert to string format to match ID conventions in the API
+          id: String(userId), // Just use the numeric ID directly, the comparison function will handle matching
+          username: user?.username || '',
+          displayName: user?.username || '',
         },
         likesCount: 0,
         retweetsCount: 0,
         repliesCount: 0
       };
+      
+      if (!user || userId === undefined) {
+        console.error('[TweetComposer] Error: User ID (sub) is missing');
+        setError('Unable to create tweet - missing user information');
+        setIsLoading(false);
+        return;
+      }
 
       // Save to local storage
-      addLocalTweet(mockTweet);
+      console.log('[TweetComposer] Full tweet object:', JSON.stringify(newTweet, null, 2));
+      try {
+        addLocalTweet(newTweet);
+        console.log('[TweetComposer] Tweet saved successfully');
+      } catch (storageError) {
+        console.error('[TweetComposer] Error saving to local storage:', storageError);
+        throw storageError; // Re-throw to be caught by outer try-catch
+      }
       
       // Clear form and show success
       setTimeout(() => {
@@ -69,7 +100,8 @@ export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
         }, 3000)
       }, 500)
     } catch (err) {
-      setError("An unexpected error occurred")
+      console.error('[TweetComposer] Error creating tweet:', err);
+      setError("An unexpected error occurred: " + (err instanceof Error ? err.message : String(err)))
       setIsLoading(false)
     }
   }
@@ -98,7 +130,7 @@ export function TweetComposer({ onTweetCreated }: TweetComposerProps) {
 
           <div className="flex space-x-3">
             <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-semibold text-sm">You</span>
+              <span className="text-white font-semibold text-sm">{user?.username?.[0]?.toUpperCase() || 'Y'}</span>
             </div>
 
             <div className="flex-1 space-y-3">

@@ -47,8 +47,13 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    // Convert id to number if it's a string
+    const userId = typeof id === 'string' ? parseInt(id, 10) : id;
+    
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
     });
     
     if (!user) {
@@ -62,7 +67,7 @@ export class UsersService {
     } as unknown as User;
   }
 
-  async findByUsername(username: string): Promise<User | null> {
+  async findByUsername(username: string, currentUserId?: number): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { username },
     });
@@ -71,10 +76,30 @@ export class UsersService {
       return null;
     }
     
+    let isFollowedByMe = false;
+    
+    // If currentUserId is provided, check if the current user follows this user
+    if (currentUserId) {
+      console.log(`Checking if user ${currentUserId} follows user ${user.id}`);
+      
+      const followRecord = await this.prisma.follow.findUnique({
+        where: {
+          followerId_followeeId: {
+            followerId: currentUserId,
+            followeeId: user.id
+          }
+        }
+      });
+      
+      isFollowedByMe = !!followRecord;
+      console.log(`Follow record found: ${isFollowedByMe}`);
+    }
+    
     // Map to User entity with proper typing
     return {
       ...user,
-      databaseId: user.id
+      databaseId: user.id,
+      isFollowedByMe
     } as unknown as User;
   }
 

@@ -14,7 +14,8 @@ export function getLocalTweets(): Tweet[] {
   try {
     const tweetsJson = localStorage.getItem(KEYS.LOCAL_TWEETS);
     if (!tweetsJson) return [];
-    return JSON.parse(tweetsJson);
+    const tweets = JSON.parse(tweetsJson);
+    return tweets;
   } catch (error) {
     console.error('Error retrieving tweets from local storage:', error);
     return [];
@@ -34,8 +35,22 @@ export function saveLocalTweets(tweets: Tweet[]): void {
 
 // Add a new tweet to local storage
 export function addLocalTweet(tweet: Tweet): void {
+  console.log('[LocalStorage] addLocalTweet called with tweet:', JSON.stringify(tweet, null, 2));
   if (typeof window === 'undefined') return;
   
+  // Safety check - ensure tweet has a valid author
+  if (!tweet.author) {
+    console.error('Cannot add tweet: Missing author object');
+    throw new Error('Missing author object in tweet');
+  }
+  
+  // Safety check - ensure tweet author has an ID
+  if (!tweet.author.id) {
+    console.error('Cannot add tweet: Author missing ID', JSON.stringify(tweet.author));
+    throw new Error('Author missing ID');
+  }
+  
+  console.log('[LocalStorage] Adding tweet with author ID:', tweet.author.id);
   const tweets = getLocalTweets();
   saveLocalTweets([tweet, ...tweets]);
 }

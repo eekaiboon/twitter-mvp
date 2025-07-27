@@ -8,6 +8,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TweetsModule } from './modules/tweets/tweets.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { NodeModule } from './modules/node/node.module';
+import { FollowsModule } from './modules/follows/follows.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { NodeModule } from './modules/node/node.module';
     AuthModule,
     TweetsModule,
     NodeModule,
+    FollowsModule,
   ],
 })
 export class AppModule {}

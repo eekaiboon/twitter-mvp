@@ -1,32 +1,54 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { followUser, unfollowUser } from "@/lib/api/actions/follow"
 import { useToast } from "@/hooks/use-toast"
+import { useFollow } from "@/lib/client/follow-storage"
 
 interface FollowButtonProps {
   userId: string
   initialIsFollowing: boolean
+  username: string
 }
 
-export function FollowButton({ userId, initialIsFollowing }: FollowButtonProps) {
-  const [isFollowing, setIsFollowing] = useState(initialIsFollowing)
+export function FollowButton({ userId, initialIsFollowing, username }: FollowButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
+  const { updateFollowStatus, incrementFollowerCount, decrementFollowerCount, followMap } = useFollow()
+  
+  // Debug userId
+  useEffect(() => {
+    console.log("FollowButton received userId:", userId, typeof userId)
+  }, [userId])
+  
+  // Initialize follow status in store - only on mount or when key dependencies change
+  useEffect(() => {
+    // Check if the current value is different before updating
+    if (followMap[userId] !== initialIsFollowing) {
+      updateFollowStatus(userId, initialIsFollowing)
+    }
+  }, [userId, initialIsFollowing, updateFollowStatus])
+  
+  // Get current follow status from context
+  const followStatus = followMap[userId] ?? initialIsFollowing
 
   const handleFollowToggle = async () => {
     setIsLoading(true)
 
     try {
-      if (isFollowing) {
-        const result = await unfollowUser({ userId })
+      if (followStatus) {
+        const result = await unfollowUser({ targetUserId: userId, username })
         if (result.success) {
-          setIsFollowing(false)
+          updateFollowStatus(userId, false)
+          decrementFollowerCount(userId)
           toast({
             title: "Unfollowed successfully",
             description: "You are no longer following this user.",
           })
+          
+          // Reload the page to show updated follower count
+          window.location.reload()
         } else {
           toast({
             title: "Error",
@@ -35,13 +57,17 @@ export function FollowButton({ userId, initialIsFollowing }: FollowButtonProps) 
           })
         }
       } else {
-        const result = await followUser({ userId })
+        const result = await followUser({ targetUserId: userId, username })
         if (result.success) {
-          setIsFollowing(true)
+          updateFollowStatus(userId, true)
+          incrementFollowerCount(userId)
           toast({
             title: "Following successfully",
             description: "You are now following this user.",
           })
+          
+          // Reload the page to show updated follower count
+          window.location.reload()
         } else {
           toast({
             title: "Error",
@@ -65,10 +91,19 @@ export function FollowButton({ userId, initialIsFollowing }: FollowButtonProps) 
     <Button
       onClick={handleFollowToggle}
       disabled={isLoading}
-      variant={isFollowing ? "outline" : "default"}
-      className={isFollowing ? "hover:bg-red-50 hover:text-red-600 hover:border-red-200" : ""}
+      variant={followStatus ? "outline" : "default"}
+      className={`${followStatus ? "hover:bg-red-50 hover:text-red-600 hover:border-red-200" : ""} group`}
     >
-      {isLoading ? "Loading..." : isFollowing ? <span className="group-hover:hidden">Following</span> : "Follow"}
+      {isLoading ? (
+        "Loading..."
+      ) : followStatus ? (
+        <>
+          <span className="group-hover:hidden">Following</span>
+          <span className="hidden group-hover:inline text-red-600">Unfollow</span>
+        </>
+      ) : (
+        "Follow"
+      )}
     </Button>
   )
 }

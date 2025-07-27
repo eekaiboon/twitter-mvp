@@ -1,31 +1,35 @@
 import { gql } from "@apollo/client"
 
 export const FOLLOW_USER_MUTATION = gql`
-  mutation FollowUser($input: FollowInput!) {
-    followUser(input: $input) {
-      id
-      followerId
-      followingId
-      createdAt
-      follower {
+  mutation FollowUser($targetUserId: String!) {
+    followUser(targetUserId: $targetUserId) {
+      success
+      targetUser {
         id
         username
         email
+        followersCount
+        followingCount
+        isFollowedByMe
       }
-      following {
-        id
-        username
-        email
-      }
+      error
     }
   }
 `
 
 export const UNFOLLOW_USER_MUTATION = gql`
-  mutation UnfollowUser($input: FollowInput!) {
-    unfollowUser(input: $input) {
+  mutation UnfollowUser($targetUserId: String!) {
+    unfollowUser(targetUserId: $targetUserId) {
       success
-      message
+      targetUser {
+        id
+        username
+        email
+        followersCount
+        followingCount
+        isFollowedByMe
+      }
+      error
     }
   }
 `

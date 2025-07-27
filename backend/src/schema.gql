@@ -22,6 +22,12 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type FollowResult {
+  error: String
+  success: Boolean!
+  targetUser: User
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -29,8 +35,10 @@ input LoginInput {
 
 type Mutation {
   createTweet(input: CreateTweetInput!): Tweet!
+  followUser(targetUserId: String!): FollowResult!
   login(input: LoginInput!): AuthPayload!
   signup(input: CreateUserInput!): AuthPayload!
+  unfollowUser(targetUserId: String!): FollowResult!
 }
 
 interface Node {
@@ -59,7 +67,12 @@ type Tweet implements Node {
 type User implements Node {
   createdAt: DateTime!
   email: String!
+  followers: [User!]
+  followersCount: Float!
+  following: [User!]
+  followingCount: Float!
   id: ID!
+  isFollowedByMe: Boolean!
   updatedAt: DateTime!
   username: String!
 }

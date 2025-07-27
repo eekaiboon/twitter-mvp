@@ -1,9 +1,11 @@
 "use client"
 
+import { useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "lucide-react"
 import { FollowButton } from "./follow-button"
+import { UserStats } from "./user-stats"
 import type { UserProfile } from "@/types/follow"
 
 interface ProfileHeaderProps {
@@ -12,6 +14,13 @@ interface ProfileHeaderProps {
 }
 
 export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
+  // Debug user object
+  useEffect(() => {
+    console.log("Profile user object:", user)
+    console.log("User ID:", user.id, "Type:", typeof user.id)
+    console.log("Is followed by me:", user.isFollowedByMe, "Type:", typeof user.isFollowedByMe)
+  }, [user])
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("en-US", {
@@ -38,7 +47,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
               {isOwnProfile ? (
                 <Button variant="outline">Edit Profile</Button>
               ) : (
-                <FollowButton userId={user.id} initialIsFollowing={user.isFollowing} />
+                <FollowButton userId={user.id} initialIsFollowing={user.isFollowedByMe} username={user.username} />
               )}
             </div>
           </div>
@@ -50,8 +59,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
               <p className="text-gray-600">{user.email}</p>
             </div>
 
-            {user.bio && <p className="text-gray-900">{user.bio}</p>}
-
+            
             <div className="flex items-center space-x-4 text-gray-600">
               <div className="flex items-center space-x-1">
                 <Calendar className="w-4 h-4" />
@@ -60,20 +68,7 @@ export function ProfileHeader({ user, isOwnProfile }: ProfileHeaderProps) {
             </div>
 
             {/* Follow Stats */}
-            <div className="flex items-center space-x-6">
-              <div className="flex items-center space-x-1">
-                <span className="font-bold text-gray-900">{user.followingCount}</span>
-                <span className="text-gray-600">Following</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <span className="font-bold text-gray-900">{user.followersCount}</span>
-                <span className="text-gray-600">Followers</span>
-              </div>
-              <div className="flex items-center space-x-1">
-                <span className="font-bold text-gray-900">{user.tweetsCount}</span>
-                <span className="text-gray-600">Tweets</span>
-              </div>
-            </div>
+            <UserStats user={user} />
           </div>
         </div>
       </CardContent>

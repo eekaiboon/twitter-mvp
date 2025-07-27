@@ -1,9 +1,10 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { TweetCard } from "./tweet-card"
 import { TweetSkeleton } from "./tweet-skeleton"
 import { getLocalTweets } from "@/lib/client/local-storage"
+import { idsMatch } from "@/lib/client/global-id"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { RefreshCw } from "lucide-react"
@@ -14,29 +15,60 @@ interface UserTweetsListProps {
   refreshTrigger?: number
 }
 
+// Check if userId is valid and not undefined
+function isValidUserId(id: any): id is string {
+  return typeof id === 'string' && id !== undefined && id !== '';
+}
+
 export function UserTweetsList({ userId, refreshTrigger = 0 }: UserTweetsListProps) {
+  console.log('[UserTweetsList] Received userId:', userId);
+  // Validate the userId to prevent undefined issues
+  const validUserId = isValidUserId(userId) ? userId : '';
   const [tweets, setTweets] = useState<Tweet[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
-  // Load tweets from local storage
-  useEffect(() => {
+  
+  // Define loadTweets as a useCallback function to prevent infinite renders
+  const loadTweets = useCallback(() => {
     setIsLoading(true)
+    console.log('[UserTweetsList] Loading tweets for userId:', validUserId)
     
-    // Simulate network latency
-    setTimeout(() => {
-      const localTweets = getLocalTweets()
-      setTweets(localTweets)
-      setIsLoading(false)
+    // Use setTimeout to simulate network latency
+    const timer = setTimeout(() => {
+      try {
+        const localTweets = getLocalTweets()
+        console.log('[UserTweetsList] All local tweets:', localTweets)
+        
+        // Only show tweets by the current profile user
+        const userTweets = localTweets.filter(tweet => {
+          const matches = tweet.author && tweet.author.id && validUserId && idsMatch(tweet.author.id, validUserId)
+          console.log('[UserTweetsList] Tweet filtering:', {
+            tweetAuthorId: tweet.author?.id,
+            userId: validUserId,
+            matches: matches
+          })
+          return matches
+        })
+        
+        console.log('[UserTweetsList] Filtered tweets for current user:', userTweets)
+        setTweets(userTweets)
+      } catch (error) {
+        console.error('[UserTweetsList] Error loading tweets:', error)
+      } finally {
+        setIsLoading(false)
+      }
     }, 300)
-  }, [refreshTrigger])
-
+    
+    return () => clearTimeout(timer)
+  }, [validUserId])
+  
+  // Load tweets initially and when dependencies change
+  useEffect(() => {
+    return loadTweets()
+  }, [loadTweets, refreshTrigger])
+  
+  // Handle refresh button click
   const handleRefresh = () => {
-    setIsLoading(true)
-    setTimeout(() => {
-      const localTweets = getLocalTweets()
-      setTweets(localTweets)
-      setIsLoading(false)
-    }, 300)
+    loadTweets()
   }
 
   if (isLoading) {

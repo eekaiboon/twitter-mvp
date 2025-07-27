@@ -168,6 +168,43 @@ backend/
 - Node.js (v18 or higher)
 - npm or pnpm
 
+## Database Management
+
+### Resetting the Database
+
+If you need to reset the database to start fresh, follow these steps:
+
+1. Navigate to the backend directory:
+   ```bash
+   cd backend
+   ```
+
+2. Use one of these methods to reset the database:
+
+   **Method 1**: Using the setup script (recommended)
+   ```bash
+   # Delete the existing database file (if needed)
+   rm -f prisma/dev.db
+   # Run the setup script to recreate the database
+   ./setup-db.sh
+   ```
+
+   **Method 2**: Using Prisma directly
+   ```bash
+   # Force reset the database (drops all tables and recreates them)
+   npx prisma db push --force-reset
+   # Regenerate the Prisma client
+   npx prisma generate
+   ```
+
+3. Verify the reset was successful:
+   ```bash
+   # List all tables in the database (should show empty tables)
+   sqlite3 prisma/dev.db ".tables"
+   ```
+
+After resetting, you'll have a clean database with all required tables but no data.
+
 ## Getting Started
 
 ### Backend Setup

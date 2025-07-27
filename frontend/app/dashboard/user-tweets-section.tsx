@@ -1,26 +1,28 @@
 "use client"
 
-import { TweetComposer } from "@/components/tweets/tweet-composer"
 import { UserTweetsList } from "@/components/tweets/user-tweets-list"
 import type { User } from "@/types/auth"
-import { useState } from "react"
 
 interface UserTweetsSectionProps {
   user: User
+  refreshTrigger?: number
 }
 
-export default function UserTweetsSection({ user }: UserTweetsSectionProps) {
-  const [refreshTrigger, setRefreshTrigger] = useState(0)
+export default function UserTweetsSection({ user, refreshTrigger = 0 }: UserTweetsSectionProps) {
+  console.log('[UserTweetsSection] Rendering with user:', user);
   
-  const handleTweetCreated = () => {
-    // Increment refresh trigger to force tweets list to refresh
-    setRefreshTrigger(prev => prev + 1)
+  // Use sub as the user ID since that's what's available in the JWT token
+  const userId = user?.sub || user?.id;
+  console.log('[UserTweetsSection] Using User ID:', userId);
+  console.log('[UserTweetsSection] Received refreshTrigger:', refreshTrigger);
+  
+  if (!userId) {
+    console.error('[UserTweetsSection] No user ID available:', user);
   }
   
   return (
-    <div className="space-y-4">
-      <TweetComposer onTweetCreated={handleTweetCreated} />
-      <UserTweetsList userId={user.id} refreshTrigger={refreshTrigger} />
+    <div>
+      <UserTweetsList userId={String(userId)} refreshTrigger={refreshTrigger} />
     </div>
   )
 }

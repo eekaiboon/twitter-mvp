@@ -1,0 +1,49 @@
+{
+        "prompt_name": "gl_account_settings_suggestion",
+        "payload": {
+          "gl_accounts": [
+            {
+              "gl_account_id": "AP_001",
+              "gl_account_code": "2100",
+              "gl_account_name": "Accounts Payable",
+              "gl_account_type": "BILL_ACCOUNTS_PAYABLE"
+            },
+            {
+              "gl_account_id": "CB_001",
+              "gl_account_code": "1120",
+              "gl_account_name": "Brex Card Bank Account",
+              "gl_account_type": "CARD_BANK_ACCOUNT"
+            },
+            {
+              "gl_account_id": "CR_001",
+              "gl_account_code": "1300",
+              "gl_account_name": "Employee Card Repayments",
+              "gl_account_type": "ACCOUNTS_RECEIVABLE"
+            },
+            {
+              "gl_account_id": "RW_001",
+              "gl_account_code": "2500",
+              "gl_account_name": "Card Rewards Liability",
+              "gl_account_type": "REWARDS"
+            },
+            {
+              "gl_account_id": "RL_001",
+              "gl_account_code": "2200",
+              "gl_account_name": "Employee Reimbursement Liability",
+              "gl_account_type": "REIMBURSEMENT_LIABILITY"
+            },
+            {
+              "gl_account_id": "CA_001",
+              "gl_account_code": "2600",
+              "gl_account_name": "Card Expenses Accrued Liabilities",
+              "gl_account_type": "ACCRUED_LIABILITIES"
+            },
+            {
+              "gl_account_id": "RA_001",
+              "gl_account_code": "2605",
+              "gl_account_name": "Reimbursement Accrued Liabilities",
+              "gl_account_type": "REIMBURSEMENT_ACCRUED_LIABILITIES"
+            }
+          ]
+        }
+      }

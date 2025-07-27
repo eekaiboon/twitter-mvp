@@ -24,7 +24,13 @@ export async function getCurrentUser() {
   try {
     // Decode JWT to get user info
     const payload = JSON.parse(atob(token.split(".")[1]))
-    return payload.user || payload
+    console.log('[Auth] Decoded user payload:', JSON.stringify(payload, null, 2))
+    
+    // Get the user data and ensure it has the right properties
+    const userData = payload.user || payload
+    console.log('[Auth] Final user data:', JSON.stringify(userData, null, 2))
+    
+    return userData
   } catch (error) {
     console.error("Error decoding token:", error)
     return null

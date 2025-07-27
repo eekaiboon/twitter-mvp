@@ -12,9 +12,17 @@ export class UsersResolver {
 
   // Removed user(id) query in favor of the node query
 
+  @UseGuards(JwtAuthGuard)
   @Query(() => User, { name: 'userByUsername', nullable: true })
-  async findByUsername(@Args('username') username: string): Promise<User | null> {
-    return this.usersService.findByUsername(username);
+  async findByUsername(
+    @Args('username') username: string,
+    @CurrentUser() currentUser: User
+  ): Promise<User | null> {
+    console.log('userByUsername query called with currentUser:', currentUser ? 
+      { id: currentUser.id, username: currentUser.username, databaseId: currentUser.databaseId } : null);
+    
+    // Pass the current user's databaseId to check if they follow the requested user
+    return this.usersService.findByUsername(username, currentUser?.databaseId);
   }
 
   @UseGuards(JwtAuthGuard)
