@@ -12,13 +12,15 @@ The project is split into two primary parts:
 
 Both parts use a shared GraphQL schema to enforce type safety and clean API design.
 
-## Authentication Flow
+## Authentication Architecture
+
+### Authentication Flow
 
 The authentication system uses JWT tokens with the following flow:
 
 1. **Login/Signup**: User submits credentials via GraphQL mutation
-2. **Token Generation**: Backend validates credentials and generates JWT token containing user ID
-3. **Token Storage**: Frontend stores the JWT in local storage or memory
+2. **Token Generation**: Backend validates credentials and generates JWT token containing user ID and metadata
+3. **Token Storage**: Frontend stores the JWT in an HTTP-only cookie named `auth-token`
 4. **Request Authorization**: Frontend includes JWT in the Authorization header for subsequent requests
 5. **Token Validation**: 
    - JwtStrategy extracts and decodes the token
@@ -26,6 +28,96 @@ The authentication system uses JWT tokens with the following flow:
    - User object is attached to request context
 6. **Route Protection**: JwtAuthGuard protects routes requiring authentication
 7. **User Access**: CurrentUser decorator extracts authenticated user data from request
+
+### Frontend Authentication Implementation
+
+#### Cookie-Based Token Storage
+
+The application uses cookies for secure token storage:
+
+```typescript
+// Set token in cookie during login/signup
+setCookie("auth-token", token, 7) // 7-day expiration
+
+// Delete token during logout
+deleteCookie("auth-token")
+```
+
+#### Authentication Checks
+
+Authentication is verified at multiple levels:
+
+1. **Next.js Middleware**: Protects routes and enforces authentication requirements
+   ```typescript
+   // Redirect to login if accessing protected routes without token
+   if (!token && pathname.startsWith("/dashboard")) {
+     return NextResponse.redirect(new URL("/auth/login", request.url))
+   }
+   ```
+
+2. **Server Components**: Verify user authentication state
+   ```typescript
+   // Get the current user
+   const currentUser = await getCurrentUser()
+   if (!currentUser) {
+     redirect("/auth/login")
+   }
+   ```
+
+3. **Apollo Client**: Includes authentication token in GraphQL requests
+   ```typescript
+   const authLink = setContext((_, { headers }) => {
+     const token = getCookie('auth-token')
+     return {
+       headers: {
+         ...headers,
+         authorization: token ? `Bearer ${token}` : "",
+       },
+     }
+   })
+   ```
+
+### Backend Authentication Implementation
+
+#### JWT-Based Authentication
+
+1. **Token Generation**: Creates signed JWT containing user data
+   ```typescript
+   private generateToken(user: any): string {
+     const payload: JwtPayload = {
+       sub: user.id,
+       email: user.email,
+       username: user.username,
+     };
+     return this.jwtService.sign(payload);
+   }
+   ```
+
+2. **Passport Strategy**: Extracts and validates JWT tokens
+   ```typescript
+   // JWT strategy configuration
+   super({
+     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+     ignoreExpiration: false,
+     secretOrKey: configService.get<string>('JWT_SECRET'),
+   });
+   ```
+
+3. **GraphQL Guards**: Protects GraphQL operations with JwtAuthGuard
+   ```typescript
+   @UseGuards(JwtAuthGuard)
+   @Query(() => User)
+   async me(@CurrentUser() user: User) {
+     return user;
+   }
+   ```
+
+### Security Considerations
+
+- **HTTP-Only Cookies**: Protects tokens from XSS attacks
+- **JWT Expiration**: Tokens expire after 7 days for security
+- **Password Hashing**: Uses bcrypt for secure password storage
+- **Error Handling**: Generic error messages prevent information leakage
 
 ## Codebase Structure
 
