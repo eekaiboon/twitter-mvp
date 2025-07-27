@@ -7,7 +7,7 @@ A minimal viable product (MVP) version of Twitter demonstrating core social netw
 This project implements a Twitter-like application with core features including authentication, tweeting, following, feed viewing, search, and user profiles. The implementation follows modern web development practices with a clear separation between frontend and backend services.
 
 The project is split into two primary parts:
-- `frontend/`: Next.js application with TypeScript, Tailwind CSS, and Apollo Client
+- `frontend/`: Next.js application with TypeScript, Tailwind CSS, Apollo Client, Radix UI, and shadcn/ui
 - `backend/`: Nest.js application with TypeScript, GraphQL, and SQLite
 
 Both parts use a shared GraphQL schema to enforce type safety and clean API design.
@@ -144,6 +144,8 @@ backend/
 - Follow component composition patterns
 - Implement responsive design with mobile-first approach
 - Use Tailwind CSS utility classes consistently
+- Leverage Radix UI for accessible component primitives
+- Implement shadcn/ui pattern for styled, customizable components
 - Implement proper loading states and error handling
 - Follow Next.js best practices for routing and data fetching
 - Use Apollo Client effectively for GraphQL operations
