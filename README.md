@@ -282,7 +282,7 @@ The frontend application will be available at http://localhost:3000
 - Create and fetch tweets
 - User profile tweets
 
-### Milestone 3: Follow System
+### Milestone 3: Follow System ✅
 - Follow/unfollow users
 - Follower and following counts
 
