@@ -1,6 +1,6 @@
 import { Resolver, Query, Args, ID } from '@nestjs/graphql';
 import { Node } from '../../common/interfaces/node.interface';
-import { fromGlobalId } from '../../common/utils/relay.utils';
+import { extractDatabaseId, fromGlobalId } from '../../common/utils/id-utils';
 import { UsersService } from '../users/users.service';
 
 @Resolver(() => Node)
@@ -14,8 +14,8 @@ export class NodeResolver {
   @Query(() => Node, { name: 'node', nullable: true })
   async getNode(@Args('id', { type: () => ID }) id: string): Promise<Node | null> {
     try {
-      const [type, dbId] = fromGlobalId(id);
-      const numericId = parseInt(dbId, 10);
+      const { type, id: dbId } = fromGlobalId(id);
+      const numericId = Number(dbId);
       
       switch (type) {
         case 'User': {

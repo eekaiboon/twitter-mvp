@@ -1,9 +1,11 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { User } from '../../users/entities/user.entity';
+import { Node } from '../../../common/interfaces/node.interface';
 
-@ObjectType()
-export class Follow {
-  id: number;
+@ObjectType({ implements: [Node] })
+export class Follow implements Node {
+  // Internal database ID (not exposed in GraphQL)
+  databaseId: number;
 
   followerId: number;
 

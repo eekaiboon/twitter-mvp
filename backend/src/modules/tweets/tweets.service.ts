@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateTweetInput } from './dto/create-tweet.dto';
-import { fromGlobalId } from '../../common/utils/relay.utils';
+import { extractDatabaseId } from '../../common/utils/id-utils';
 import { Tweet } from './entities/tweet.entity';
 
 @Injectable()
@@ -23,13 +23,8 @@ export class TweetsService {
   }
 
   async findAllByUser(userGlobalId: string): Promise<Tweet[]> {
-    const [type, userIdStr] = fromGlobalId(userGlobalId);
-    
-    if (type !== 'User') {
-      throw new NotFoundException(`Invalid user ID format`);
-    }
-    
-    const userId = parseInt(userIdStr, 10);
+    try {
+      const userId = extractDatabaseId(userGlobalId);
     
     const tweets = await this.prisma.tweet.findMany({
       where: {
@@ -44,6 +39,9 @@ export class TweetsService {
     });
 
     return tweets.map(tweet => this.mapTweetToEntity(tweet));
+    } catch (error) {
+      throw new NotFoundException(`Could not find tweets for user: ${error.message}`);
+    }
   }
 
   async findOneById(id: number): Promise<Tweet> {

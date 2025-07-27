@@ -2,6 +2,7 @@
 
 import { useState, ReactNode, useCallback } from 'react'
 import { FollowContext } from '@/lib/client/follow-storage'
+import { idsMatch } from '@/lib/api/id-utils'
 
 interface FollowProviderProps {
   children: ReactNode
@@ -15,11 +16,20 @@ export function FollowProvider({ children }: FollowProviderProps) {
   // Update follow status for a user - using useCallback to prevent infinite renders
   const updateFollowStatus = useCallback((userId: string, isFollowing: boolean) => {
     setFollowMap(prev => {
-      // Only update if the status has actually changed
-      if (prev[userId] !== isFollowing) {
-        return { ...prev, [userId]: isFollowing };
-      }
-      return prev;
+      // Use normalized ID handling
+      const updatedMap = { ...prev };
+      
+      // Update this specific ID
+      updatedMap[userId] = isFollowing;
+      
+      // Also ensure any matching IDs (global vs raw) get the same status
+      Object.keys(updatedMap).forEach(existingId => {
+        if (existingId !== userId && idsMatch(existingId, userId)) {
+          updatedMap[existingId] = isFollowing;
+        }
+      });
+      
+      return updatedMap;
     });
   }, []);
 

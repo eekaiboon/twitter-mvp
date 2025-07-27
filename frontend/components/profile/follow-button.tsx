@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { followUser, unfollowUser } from "@/lib/api/actions/follow"
 import { useToast } from "@/hooks/use-toast"
 import { useFollow } from "@/lib/client/follow-storage"
+import { idsMatch } from "@/lib/api/id-utils"
 
 interface FollowButtonProps {
   userId: string

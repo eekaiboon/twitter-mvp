@@ -1,7 +1,7 @@
 'use client';
 
 import { graphqlClient } from "../client"
-import { toGlobalId } from "../global-id"
+import { toGlobalId } from "../id-utils"
 import {
   FOLLOW_USER_MUTATION,
   UNFOLLOW_USER_MUTATION

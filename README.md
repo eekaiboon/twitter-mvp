@@ -59,6 +59,36 @@ The application follows the GraphQL Relay Global Object Identification specifica
 - The frontend uses these Global IDs directly from the backend
 - This approach provides type safety and supports multiple data sources
 
+### ID Management Architecture
+
+The application uses a consistent ID handling approach across the stack:
+
+#### ID Types
+
+1. **Database IDs**: Raw numeric values used internally in the database (e.g., `1`, `42`)
+   - Used only within backend services and database operations
+
+2. **Global IDs**: Base64-encoded strings containing type and ID information (e.g., `"VXNlcjox"` for `"User:1"`)
+   - Used in the GraphQL API for client-server communication
+   - Follows the Relay Global Object Identification specification
+   - Provides a consistent, opaque identifier format for all entities
+
+#### ID Utility Functions
+
+To handle different ID formats, the codebase provides several utility functions:
+
+- `toGlobalId(type, id)`: Converts a type and database ID to a global ID
+- `fromGlobalId(globalId)`: Parses a global ID into its type and database ID components
+- `extractDatabaseId(id)`: Extracts a database ID from a global ID or returns the original if it's already a number
+- `idsMatch(id1, id2)`: Checks if two IDs refer to the same entity, regardless of format
+
+#### Architecture Benefits
+
+- **Type Safety**: Every ID carries information about what type of entity it identifies
+- **Consistency**: Single source of truth for ID conversion and comparison logic
+- **Encapsulation**: Database IDs are never directly exposed to clients
+- **Flexibility**: Support for multiple ID formats with consistent behavior
+
 ### Frontend Structure
 ```
 frontend/

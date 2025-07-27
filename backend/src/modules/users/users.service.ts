@@ -3,6 +3,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { CreateUserInput } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { extractDatabaseId } from '../../common/utils/id-utils';
 
 @Injectable()
 export class UsersService {
@@ -46,9 +47,9 @@ export class UsersService {
     } as unknown as User;
   }
 
-  async findOne(id: number): Promise<User | null> {
-    // Convert id to number if it's a string
-    const userId = typeof id === 'string' ? parseInt(id, 10) : id;
+  async findOne(id: number | string): Promise<User | null> {
+    // Convert id to database ID format if needed
+    const userId = typeof id === 'string' && isNaN(Number(id)) ? extractDatabaseId(id) : Number(id);
     
     const user = await this.prisma.user.findFirst({
       where: {

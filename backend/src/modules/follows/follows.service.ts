@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ConflictException, ForbiddenException } 
 import { PrismaService } from '../../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
-import { fromGlobalId } from '../../common/utils/relay.utils';
+import { extractDatabaseId } from '../../common/utils/id-utils';
 
 @Injectable()
 export class FollowsService {
@@ -14,12 +14,7 @@ export class FollowsService {
   async followUser(currentUserId: number, targetUserGlobalId: string): Promise<{ success: boolean; targetUser: User; error?: string }> {
     // Convert global ID to database ID
     try {
-      const [_, targetUserIdStr] = fromGlobalId(targetUserGlobalId);
-      const targetUserId = parseInt(targetUserIdStr, 10);
-      
-      if (isNaN(targetUserId)) {
-        throw new Error(`Invalid user ID: ${targetUserIdStr}`);
-      }
+      const targetUserId = extractDatabaseId(targetUserGlobalId);
 
       // Check if user exists
       const targetUser = await this.usersService.findOne(targetUserId);
@@ -71,12 +66,7 @@ export class FollowsService {
   async unfollowUser(currentUserId: number, targetUserGlobalId: string): Promise<{ success: boolean; targetUser: User; error?: string }> {
     // Convert global ID to database ID
     try {
-      const [_, targetUserIdStr] = fromGlobalId(targetUserGlobalId);
-      const targetUserId = parseInt(targetUserIdStr, 10);
-      
-      if (isNaN(targetUserId)) {
-        throw new Error(`Invalid user ID: ${targetUserIdStr}`);
-      }
+      const targetUserId = extractDatabaseId(targetUserGlobalId);
 
       // Check if user exists
       const targetUser = await this.usersService.findOne(targetUserId);
@@ -134,7 +124,7 @@ export class FollowsService {
 
     return followers.map(follow => ({
       ...follow.follower,
-      databaseId: follow.follower.id,
+      databaseId: follow.follower.id, // Map database ID to our entity format
     })) as unknown as User[];
   }
 
@@ -150,7 +140,7 @@ export class FollowsService {
 
     return following.map(follow => ({
       ...follow.followee,
-      databaseId: follow.followee.id,
+      databaseId: follow.followee.id, // Map database ID to our entity format
     })) as unknown as User[];
   }
 
