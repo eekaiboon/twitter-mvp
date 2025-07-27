@@ -1,4 +1,6 @@
 import { Resolver, Query, Args, ID } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Node } from '../../common/interfaces/node.interface';
 import { extractDatabaseId, fromGlobalId } from '../../common/utils/id-utils';
 import { UsersService } from '../users/users.service';
@@ -11,6 +13,7 @@ export class NodeResolver {
     // private readonly tweetsService: TweetsService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Query(() => Node, { name: 'node', nullable: true })
   async getNode(@Args('id', { type: () => ID }) id: string): Promise<Node | null> {
     try {

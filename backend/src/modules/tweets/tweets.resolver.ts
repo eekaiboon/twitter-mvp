@@ -26,6 +26,7 @@ export class TweetsResolver {
     return this.tweetsService.create(user.databaseId, createTweetInput);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Query(() => [Tweet])
   async getUserTweets(@Args() { userId }: GetUserTweetsArgs): Promise<Tweet[]> {
     return this.tweetsService.findAllByUser(userId);
