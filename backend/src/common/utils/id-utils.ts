@@ -1,13 +1,15 @@
 /**
- * Backend implementation of ID utilities
+ * ID utilities for consistent ID management across the application
  * 
- * This module provides Node.js-specific implementations of the ID utilities
- * defined in shared/utils/id-utils.ts
+ * This module provides utilities for handling IDs consistently using the 
+ * Relay Global Object Identification specification.
  */
+export type EntityType = 'User' | 'Tweet' | 'Follow';
 
-// Import the shared types and utilities
-import * as SharedUtils from '../../../../shared/utils/id-utils';
-export type { EntityType } from '../../../../shared/utils/id-utils';
+export function isValidEntityType(type: string): boolean {
+  const validTypes: EntityType[] = ['User', 'Tweet', 'Follow'];
+  return validTypes.includes(type as EntityType);
+}
 
 /**
  * Backend implementation of encodeId using Node.js Buffer
@@ -26,7 +28,7 @@ export function decodeId(encoded: string): string {
 /**
  * Converts a database ID to a global ID for GraphQL
  */
-export function toGlobalId(type: SharedUtils.EntityType, id: number | string): string {
+export function toGlobalId(type: EntityType, id: number | string): string {
   const idStr = typeof id === 'number' ? String(id) : id;
   return encodeId(`${type}:${idStr}`);
 }
@@ -34,16 +36,16 @@ export function toGlobalId(type: SharedUtils.EntityType, id: number | string): s
 /**
  * Parses a global ID back to its type and database ID
  */
-export function fromGlobalId(globalId: string): { type: SharedUtils.EntityType; id: string } {
+export function fromGlobalId(globalId: string): { type: EntityType; id: string } {
   try {
     const decoded = decodeId(globalId);
     const [type, id] = decoded.split(':');
     
-    if (!type || !id || !SharedUtils.isValidEntityType(type)) {
+    if (!type || !id || !isValidEntityType(type)) {
       throw new Error(`Invalid global ID format: ${globalId}`);
     }
     
-    return { type: type as SharedUtils.EntityType, id };
+    return { type: type as EntityType, id };
   } catch (error) {
     throw new Error(`Failed to decode global ID: ${error.message}`);
   }

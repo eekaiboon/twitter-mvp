@@ -2,7 +2,7 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Node } from '../../../common/interfaces/node.interface';
 
 @ObjectType({ implements: [Node] })
-export class User implements Node {
+export class User extends Node {
   // Internal database ID (not exposed in GraphQL)
   databaseId: number;
 

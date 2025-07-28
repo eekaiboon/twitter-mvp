@@ -3,7 +3,7 @@ import { User } from '../../users/entities/user.entity';
 import { Node } from '../../../common/interfaces/node.interface';
 
 @ObjectType({ implements: [Node] })
-export class Follow implements Node {
+export class Follow extends Node {
   // Internal database ID (not exposed in GraphQL)
   databaseId: number;
 
