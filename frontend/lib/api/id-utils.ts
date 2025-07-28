@@ -3,12 +3,9 @@
 /**
  * Frontend implementation of ID utilities
  * 
- * This module provides browser-specific implementations of the ID utilities
- * defined in shared/utils/id-utils.ts
+ * This module provides browser-specific implementations of ID utilities
+ * for handling global IDs in the application
  */
-
-// We can't directly import from shared in the browser, so we redefine the types and functions
-// In a more sophisticated setup, we would use a build step to share code between frontend/backend
 
 /**
  * Valid entity types in the system
